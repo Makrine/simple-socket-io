@@ -21,7 +21,7 @@ io.on('connection', (socket) => {
     
     socket.on('initConnection', (data) => {
       console.log('a user connected: ' + data.username);
-      addUser(client, data.username);
+      //addUser(client, data.username);
     });
     socket.on('disconnect', () => {
         console.log('user disconnected');
