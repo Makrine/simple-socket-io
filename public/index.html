@@ -2,17 +2,25 @@
 <html>
 
 <head>
-    <title>Socket.IO chat</title>
+    <title>My Simple Chat</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 
 <body>
-    <ul id="messages"></ul>
-    <form id="form" action="">
-        <input id="input" autocomplete="off" disabled /><button disabled>Send</button>
-    </form>
+    <h1>Create or Join a Room</h1>
+    <label>Username: </label>
+    <input type="text" id="username" placeholder="John Doe">
+    <button onclick="setUsername()">Set Username</button>
+    <br><br>
+    <button onclick="requestCreateRoom()" id="create-room" disabled>Create Room</button>
+
+    <br><br>
+
+    <button onclick="requestJoinRoom()" id="join-room" disabled>Join Room</button>
+    <input type="text" id="roomID" placeholder="Enter Room ID">
     <script src="/socket.io/socket.io.js"></script>
-    <script src="script.js"></script>
+    <script src="indexScript.js"></script>
+    <script src="chat.js"></script>
 </body>
 
 </html>

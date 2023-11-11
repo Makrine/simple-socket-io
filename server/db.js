@@ -21,34 +21,69 @@ function dbConnection() {
 }
 
 
+function createRoom(client, callback) {
+  // generate random room id with nums and letters. size should be 5
+  let roomId = Math.random().toString(36).substring(2, 7);
 
-function getValues(client) {
-  client.query('SELECT * FROM public."Users"', (err, result) => {
+    client.query(`INSERT INTO public.rooms(room_id, user_num) VALUES('${roomId}', 1)`, (err, result) => {
+        if (err) throw err;
+    
+        // Process the result
+        console.log(result.rows);
+        callback(roomId);
+        // Close the connection
+        //client.end();
+      });
+}
+
+function updateRoom(client, roomId, connected, callback) {
+
+  // check if num_users is already 2
+  client.query(`SELECT user_num FROM public.rooms WHERE room_id = '${roomId}'`, (err, result) => {
     if (err) throw err;
 
     // Process the result
     console.log(result.rows);
 
-    // Close the connection
-    client.end();
+    // if doesnt exist, then return false
+    if (result.rows.length == 0) {
+      console.log("room doesnt exist");
+      callback(false);
+      // Close the connection
+      //client.end();
+    }
+
+    // find out if user_num is already 2
+    else if (result.rows[0].user_num == 2) {
+      console.log("room is full");
+      callback(false);
+      // Close the connection
+      //client.end();
+    }
+
+    else {
+      client.query(`UPDATE public.rooms SET user_num = user_num + 1 WHERE room_id = '${roomId}'`, (err, result) => {
+        if (err) 
+        {
+          console.log("err: " + err);
+          throw err;
+        }
+    
+        // Process the result
+        console.log(`Room: ${roomId} user connected` + result.rows);
+        callback(true);
+        // Close the connection
+        //client.end();
+      });
+    }
+    
   });
 }
 
-function addUser(client, username) {
-    client.query(`INSERT INTO public.users(username) VALUES('${username}')`, (err, result) => {
-        if (err) throw err;
-    
-        // Process the result
-        console.log(result.rows);
-    
-        // Close the connection
-        client.end();
-      });
-}
 
 module.exports = {
     dbConnection,
-    getValues,
-    addUser
+    createRoom,
+    updateRoom
 }
 

@@ -6,7 +6,7 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 require('dotenv').config();
-const {dbConnection, addUser} = require(path.join(__dirname, 'db.js'));
+const {dbConnection, createRoom, updateRoom} = require(path.join(__dirname, 'db.js'));
 // #region socket io
 
 const client = dbConnection();
@@ -19,17 +19,25 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
     
-    socket.on('initConnection', (data) => {
+    socket.on('user_connected', (data) => {
       console.log('a user connected: ' + data.username);
-      addUser(client, data.username);
     });
     socket.on('disconnect', () => {
         console.log('user disconnected');
-      });
+    });
+    
+    
+    // socket.on('requestCreateRoom', (a) => {
+    //   onRoomCreateRequested();
+    // });
 
-      socket.on('chat message', (msg) => {
-        console.log('message: ' + msg);
-        io.emit('chat message', msg);
+    socket.on('requestJoinRoom', (roomId) => {
+      console.log('joinRoom requested: ' + roomId);
+      onRoomJoinRequested(roomId, socket);
+    });
+
+      socket.on('chat_message', (msg) => {
+        io.emit('chat_message', msg);
       });
 });
 const PORT = process.env.PORT || 3000;
@@ -37,3 +45,19 @@ server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 // #endregion
+
+function onRoomCreateRequested() {
+  createRoom(client, function(roomId) {
+    console.log("room created: " + roomId);
+    socket.emit('roomCreated', roomId);
+  });
+}
+
+function onRoomJoinRequested(roomId, socket) {
+  updateRoom(client, String(roomId), true, function(updated) {
+    if(updated) {
+      console.log("room joined: " + roomId);
+      socket.emit('roomJoined', roomId);
+    }
+  });
+}
