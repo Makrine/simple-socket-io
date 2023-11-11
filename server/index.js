@@ -5,6 +5,7 @@ const path = require('path');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
+require('dotenv').config();
 const {dbConnection, addUser} = require(path.join(__dirname, 'db.js'));
 // #region socket io
 
