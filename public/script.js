@@ -31,6 +31,21 @@ function initSocket() {
         socket.emit('typing', { username: username });
       });
 
+      var typingTimer;
+    var doneTypingInterval = 500; // 1000 milliseconds (1 second)
+
+    input.addEventListener('input', function() {
+      // Clear the previous typing timer
+      clearTimeout(typingTimer);
+
+      // Set a new timer to check for inactivity
+      typingTimer = setTimeout(function() {
+        console.log('No typing activity for 1 second.');
+        socket.emit('not typing', { username: username });
+        // Add your code to handle inactivity here
+      }, doneTypingInterval);
+    });
+
     form.addEventListener('submit', function (e) {
         e.preventDefault();
         if (input.value) {
@@ -40,6 +55,7 @@ function initSocket() {
     });
 
     socket.on('chat message', function (data) {
+        removeTyping();
         var item = document.createElement('li');
         item.textContent = data.username + ': ' + data.message;
         messages.appendChild(item);
@@ -47,23 +63,39 @@ function initSocket() {
     });
 
     socket.on('typing', function (data) {
-        var item = document.createElement('li', { id: 'typing' });
-        item.textContent = data + ' is typing...';
-        messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+        addTyping(data);
     });
 
     socket.on('not typing', function (data) {
-        // find item with id typing and remove it
-        var item = document.getElementById('typing');
-        if (item) {
-            item.remove();
-        }
+        removeTyping();
     });
 
     // Enable the input and button after setting the username
     document.getElementById('input').removeAttribute('disabled');
     document.querySelector('#form > button').removeAttribute('disabled');
+}
+
+function removeTyping() {
+    // find item with id typing and remove it
+    var item = document.getElementById('typing');
+    if (item) {
+        item.remove();
+    }
+}
+
+function addTyping(user) { 
+    if(user == username) return;
+    var item = document.getElementById('typing');
+        if (item) {
+        }
+        else 
+        {
+            var item = document.createElement('li');
+            item.setAttribute('id', 'typing');
+            item.textContent = user + ' is typing...';
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        }
 }
 
 // Call the promptForUsername function when the page loads
