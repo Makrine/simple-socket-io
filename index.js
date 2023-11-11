@@ -11,10 +11,10 @@ const {dbConnection, addUser} = require(path.join(__dirname, 'db.js'));
 
 const client = dbConnection();
 // Serve static files from the "public" folder
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '/public')));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+    res.sendFile(path.join(__dirname, '/public/index.html'));
 });
 
 io.on('connection', (socket) => {
