@@ -27,6 +27,15 @@ io.on('connection', (socket) => {
         console.log('user disconnected');
       });
 
+      socket.on('typing', (data) => {
+        console.log(data.username + ' is typing...');
+        io.emit('typing', data.username);
+      });
+      socket.on('not typing', (data) => {
+        console.log(data.username + ' is not typing...');
+        io.emit('not typing', data.username);
+      });
+
       socket.on('chat message', (msg) => {
         console.log('message: ' + msg);
         io.emit('chat message', msg);
